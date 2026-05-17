@@ -1,0 +1,825 @@
+/* ════════════════════════════════════════════════════════════════
+   HIMEKO THEME  v2  —  Honkai Star Rail
+   Palette: #000000  #D0271E  #863303  #E5B458  #FFFFFF
+   Architecture:
+     • Body carries the background image (simplest, most reliable)
+     • HSL token variables remapped on :root → Tailwind classes
+       automatically pick up the right colours
+     • rgba overlays on panel classes so image breathes through
+     • JS (compile-theme.js) handles the one inline bg React forces
+════════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. HSL Token Remap ─────────────────────────────────────────
+   Tailwind reads these as bare "H S% L%" triplets inside hsl().
+   We push everything toward the black/crimson/gold palette.     */
+:root,
+html {
+  /* Backgrounds — near-black with a red ember warmth */
+  --bg-000:   3  70%  2%;    /* #070000 — deepest void          */
+  --bg-100:   4  50%  5%;    /* #110200 — base panel            */
+  --bg-200:   6  45%  8%;    /* #1a0400 — raised panel          */
+  --bg-300:   8  40% 12%;    /* #250600 — card / bubble         */
+  --bg-400:  10  36% 16%;    /* #310800 — hover state           */
+  --bg-500:  12  32% 21%;    /* #400b00 — border fill           */
+
+  /* Text — white → warm cream → muted copper */
+  --text-000:  0   0% 100%;  /* #FFFFFF */
+  --text-100:  0   0%  97%;  /* #F7F7F7 */
+  --text-200: 22  18%  78%;  /* #CDB49E — warm off-white        */
+  --text-300: 22  12%  56%;  /* #9C8070 */
+  --text-400: 20   8%  38%;  /* #685448 */
+  --text-500: 18   6%  26%;  /* #473830 */
+
+  /* Brand = crimson  #D0271E ≈ hsl(3, 74%, 46%) */
+  --accent-brand:  3  74% 46%;
+  --brand-000:    22  96% 14%;   /* very dark orange — #4a1800   */
+  --brand-100:    22  96% 26%;   /* #863303                      */
+  --brand-200:     3  74% 46%;   /* #D0271E                      */
+  --brand-900:     0   0%  0%;
+
+  /* Accent = gold  #E5B458 ≈ hsl(41, 72%, 62%) */
+  --accent-000:   41  65% 38%;   /* #9e6e0e                      */
+  --accent-100:   41  70% 50%;   /* #c9920a                      */
+  --accent-200:   41  72% 62%;   /* #E5B458                      */
+  --accent-900:   41  50%  9%;   /* very dark gold               */
+
+  /* Borders — gold-tinted */
+  --border-100:   3  48% 12%;
+  --border-200:   3  52% 18%;
+  --border-300:  41  62% 28%;
+  --border-400:  41  68% 40%;
+
+  /* Shell frame variables (title bar) */
+  --claude-background-color: #000000;
+  --claude-foreground-color: #FFFFFF;
+  --claude-secondary-color:  #C8A898;
+  --claude-border:           rgba(229,180,88,0.20);
+  --claude-text-100: #FFFFFF;
+  --claude-text-200: #DDD0C0;
+  --claude-text-400: #C8A898;
+  --claude-text-500: #907060;
+}
+
+
+/* ── 2. Body — Background Image ─────────────────────────────────
+   Body itself holds the image. Transparent body-bg tricks are
+   avoided entirely; this just works.                            */
+body {
+  background-image:
+    linear-gradient(
+      160deg,
+      rgba(134,  51,  3, 0.35)  0%,    /* burnt orange top-left warmth */
+      rgba(208,  39, 30, 0.18) 15%,    /* crimson fade */
+      rgba(  0,   0,  0, 0.02) 38%,    /* nearly clear — image breathes */
+      rgba(  0,   0,  0, 0.35) 68%,    /* darkening toward bottom */
+      rgba(  0,   0,  0, 0.78) 100%    /* deep black bottom */
+    ),
+    url("/images/custom/First_Closed_Beta_Wallpaper.webp") !important;
+  background-size:     cover  !important;
+  background-position: center center !important;
+  background-repeat:   no-repeat  !important;
+  background-color:    #000000    !important;  /* fallback */
+}
+
+/* bg-bg-* kept very low opacity — they stack across many nested divs
+   so even 0.08 per layer adds up. Only surface elements (bubbles,
+   code blocks) should use the higher tiers.                       */
+.bg-bg-000 { background-color: rgba(  2,  0,  0, 0.04) !important; }
+.bg-bg-100 { background-color: rgba(  8,  1,  0, 0.07) !important; }
+.bg-bg-200 { background-color: rgba( 14,  3,  0, 0.12) !important; }
+.bg-bg-300 { background-color: rgba( 22,  5,  0, 0.22) !important; }
+.bg-bg-400 { background-color: rgba( 30,  7,  0, 0.38) !important; }
+.bg-bg-500 { background-color: rgba( 40, 10,  0, 0.55) !important; }
+
+
+/* ── 3. Top Accent Line ─────────────────────────────────────────*/
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent  0%,
+    #D0271E     25%,
+    #E5B458     50%,
+    #D0271E     75%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+}
+
+
+/* ── 4. Sidebar — Light Cone ────────────────────────────────────
+   Same gradient shape as the right panel so both feel consistent.
+   Softer opacities = less fading, more image visible.            */
+nav, aside,
+[class*="sidebar"]:not(.dframe-card):not([class*="dframe-card"]),
+[class*="Sidebar"]:not(.dframe-card),
+[data-testid="sidebar"] {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 1, 0, 0.80)  0%,
+      rgba(6, 1, 0, 0.55) 20%,
+      rgba(0, 0, 0, 0.18) 42%,
+      rgba(0, 0, 0, 0.04) 58%,
+      rgba(0, 0, 0, 0.00) 78%,
+      rgba(0, 0, 0, 0.00) 100%
+    ),
+    url("/images/custom/Character_Himeko_Splash_Art.webp")
+    center 67% / cover no-repeat !important;
+  border-right: 1px solid rgba(208, 39, 30, 0.22) !important;
+}
+
+
+/* ── 5. Himeko Countdown Art — right Cowork panel ───────────────
+   div[class*="sidebar"] catches the right panel (which has "sidebar"
+   in its class name) without touching the left aside.dframe-sidebar.
+   Higher specificity than the light-cone rule so it wins cleanly.  */
+/* Right Cowork panel — targeted by ID so updates can't break it */
+#frame-peek-popover {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 1, 0, 0.80)  0%,
+      rgba(6, 1, 0, 0.55) 20%,
+      rgba(0, 0, 0, 0.18) 42%,
+      rgba(0, 0, 0, 0.04) 58%,
+      rgba(0, 0, 0, 0.00) 78%,
+      rgba(0, 0, 0, 0.00) 100%
+    ),
+    url("/images/custom/Star_Rail_Countdown_3_Days_-_Himeko.webp")
+    60% 30% / cover no-repeat !important;
+  border-radius: 14px 0 0 14px !important;
+  overflow: hidden !important;
+  filter: drop-shadow(-3px 0 18px rgba(208, 39, 30, 0.40)) !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  ) !important;
+}
+
+/* dframe-pane-host: keep transparent, no image */
+div.dframe-pane-host {
+  background: transparent !important;
+  border-radius: 14px 0 0 14px !important;
+  overflow: hidden !important;
+}
+
+/* dframe-card elements — fully transparent so the panel image shows through */
+div.dframe-card {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* ── 6. ✦ SPECIAL: Himeko Flame Aura ─────────────────────────────
+   A breathing crimson-gold bloom that pulses from the bottom of
+   the screen — Himeko's fire radiating upward. Pure CSS animation,
+   fully mine.                                                     */
+@keyframes himeko-flame-pulse {
+  0%   { opacity: 0.45; transform: translateX(-50%) scaleX(1.00) scaleY(1.00); }
+  35%  { opacity: 0.70; transform: translateX(-50%) scaleX(1.06) scaleY(1.10); }
+  65%  { opacity: 0.58; transform: translateX(-50%) scaleX(0.97) scaleY(1.05); }
+  100% { opacity: 0.45; transform: translateX(-50%) scaleX(1.00) scaleY(1.00); }
+}
+
+@keyframes himeko-flicker {
+  0%   { opacity: 1.0; }
+  20%  { opacity: 0.82; }
+  45%  { opacity: 1.0; }
+  70%  { opacity: 0.88; }
+  100% { opacity: 1.0; }
+}
+
+
+/* Top accent line gets a flicker so it feels alive */
+body::after {
+  animation: himeko-flicker 4s ease-in-out infinite;
+}
+
+
+/* ── 7. Text ────────────────────────────────────────────────────*/
+.text-text-000 { color: #FFFFFF !important; }
+.text-text-100 { color: #F5F0EC !important; }
+.text-text-200 { color: #C8A898 !important; }
+.text-text-300 { color: #907060 !important; }
+.text-text-400 { color: #6A5040 !important; }
+.text-text-500 { color: #503830 !important; }
+
+
+/* ── 8. Borders ─────────────────────────────────────────────────*/
+.border-border-100 { border-color: rgba(208, 39, 30, 0.28) !important; }
+.border-border-200 { border-color: rgba(208, 39, 30, 0.16) !important; }
+.border-border-300 { border-color: rgba(229,180, 88, 0.28) !important; }
+.border-border-400 { border-color: rgba(229,180, 88, 0.44) !important; }
+
+
+/* ── 9. Brand / Accent classes ──────────────────────────────────*/
+.bg-accent-brand     { background-color: #D0271E !important; }
+.text-accent-brand   { color:            #D0271E !important; }
+.border-accent-brand { border-color:     #D0271E !important; }
+.bg-accent-000       { background-color: rgba(134, 51,  3, 0.60) !important; }
+.bg-accent-100       { background-color: #9e6e0e !important; }
+.bg-accent-900       { background-color: rgba(134, 51,  3, 0.40) !important; }
+.text-accent-000     { color: #C49A3A !important; }
+.text-accent-100     { color: #E5B458 !important; }
+.text-accent-200     { color: #F0CC78 !important; }
+
+
+/* ── 10. Focus Ring ─────────────────────────────────────────────*/
+*, *::before, *::after {
+  --tw-ring-offset-color: #000000 !important;
+}
+
+
+/* ── 11. Scrollbars ─────────────────────────────────────────────*/
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #D0271E, #863303);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: #E5B458; }
+
+
+/* ── 12. Input / Composer ───────────────────────────────────────*/
+
+/* The whole composer bar at the bottom — solid backdrop so it reads
+   cleanly against the colourful background image.                  */
+[class*="composer"],
+[data-testid*="composer"],
+div:has(> div[contenteditable="true"]) {
+  background: rgba(4, 1, 0, 0.88) !important;
+  backdrop-filter: blur(12px) saturate(0.6) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(0.6) !important;
+  border: 1px solid rgba(229, 180, 88, 0.28) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 0 0 1px rgba(208, 39, 30, 0.12),
+    0 4px 32px rgba(0, 0, 0, 0.70) !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Inner contenteditable / ProseMirror — the user's text input */
+div[contenteditable="true"],
+textarea,
+[class*="ProseMirror"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: #FFFFFF !important;
+  caret-color: #E5B458 !important;
+  padding: 10px 14px !important;
+}
+div[contenteditable="true"]:focus,
+textarea:focus {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+[type='text'], [type='email'], [type='search'],
+[type='password'], [type='number'],
+[multiple], select {
+  background-color: rgba(10, 2, 0, 0.88) !important;
+  border-color:     rgba(229,180,88,0.18) !important;
+  color:            #FFFFFF !important;
+}
+select option { background-color: #1C0805 !important; color: #FFFFFF !important; }
+
+
+/* ── 13. Buttons ────────────────────────────────────────────────*/
+button:hover,
+[role="button"]:hover {
+  background: rgba(229, 180, 88, 0.07) !important;
+}
+button:active,
+[role="button"]:active {
+  background: rgba(229, 180, 88, 0.12) !important;
+}
+[aria-label*="Send"], [aria-label*="send"] {
+  color: #E5B458 !important;
+}
+[aria-label*="Send"]:hover {
+  color: #F0CC78 !important;
+  filter: drop-shadow(0 0 6px rgba(229,180,88,0.55)) !important;
+}
+
+
+/* ── 14. Code Blocks ────────────────────────────────────────────*/
+pre {
+  background: rgba(0, 0, 0, 0.82) !important;
+  border: 1px solid rgba(208, 39, 30, 0.25) !important;
+  border-top: 2px solid #863303 !important;
+}
+code {
+  color: #E5B458 !important;
+  background: rgba(134, 51, 3, 0.28) !important;
+  border: 1px solid rgba(229,180,88,0.16) !important;
+  border-radius: 3px !important;
+  padding: 0.1em 0.35em !important;
+  font-size: 0.875em !important;
+}
+pre code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  color: #F0E8E0 !important;
+  font-size: 1em !important;
+}
+
+
+/* ── 15. Animations ─────────────────────────────────────────────*/
+.animate-spin {
+  color:  #E5B458 !important;
+  fill:   #E5B458 !important;
+  filter: drop-shadow(0 0 6px rgba(229,180,88,0.55)) !important;
+}
+.animate-pulse {
+  background: rgba(208, 39, 30, 0.08) !important;
+}
+.animate-\[shimmertext_2\.25s_infinite\],
+.\[animation-name\:shimmertext\] {
+  background-image: linear-gradient(
+    90deg,
+    #FFFFFF  0%,
+    #E5B458 42%,
+    #FFFFFF 62%,
+    #FFFFFF 100%
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip:         text !important;
+  color: transparent !important;
+}
+
+
+/* ── 16. Links & Selection ──────────────────────────────────────*/
+a       { color: #E5B458 !important; }
+a:hover { color: #F0CC78 !important; }
+::selection {
+  background: rgba(208, 39, 30, 0.38) !important;
+  color: #FFFFFF !important;
+}
+
+
+/* ── 17. Tooltips ───────────────────────────────────────────────*/
+[role="tooltip"],
+[class*="tooltip"],
+[class*="Tooltip"] {
+  background: rgba(20, 5, 0, 0.97) !important;
+  border: 1px solid rgba(229,180,88,0.20) !important;
+  color: #FFFFFF !important;
+}
+
+
+/* ── 18. Active Nav ─────────────────────────────────────────────*/
+[aria-current="page"],
+[aria-selected="true"],
+[data-state="active"] {
+  background:  rgba(208, 39, 30, 0.14) !important;
+  border-left: 2px solid #D0271E !important;
+}
+
+
+/* ── 19. Prose / Message Content ────────────────────────────────*/
+/* AI message container — warm cream frosted glass so dark text pops */
+[data-testid="bot-message"],
+[class*="message"][class*="assistant"],
+div:has(> .prose) {
+  background: rgba(252, 243, 228, 0.82) !important;
+  backdrop-filter: blur(10px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.2) !important;
+  border-radius: 10px !important;
+  padding: 4px 8px !important;
+  border: 1px solid rgba(229, 180, 88, 0.18) !important;
+}
+
+.prose {
+  --tw-prose-body:          #1C0800 !important;   /* near-black warm */
+  --tw-prose-headings:      #0D0300 !important;
+  --tw-prose-lead:          #3A1800 !important;
+  --tw-prose-links:         #863303 !important;   /* burnt orange — readable on cream */
+  --tw-prose-bold:          #0D0300 !important;
+  --tw-prose-counters:      #5A2800 !important;
+  --tw-prose-bullets:       #D0271E !important;
+  --tw-prose-hr:            rgba(134,51,3,0.30) !important;
+  --tw-prose-quotes:        #2A1000 !important;
+  --tw-prose-quote-borders: #863303 !important;
+  --tw-prose-captions:      #5A2800 !important;
+  --tw-prose-code:          #863303 !important;
+  --tw-prose-pre-code:      #F0E8D8 !important;   /* light for code blocks (dark bg) */
+  --tw-prose-pre-bg:        #0D0200 !important;
+  --tw-prose-th-borders:    rgba(134,51,3,0.40) !important;
+  --tw-prose-td-borders:    rgba(134,51,3,0.18) !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Force black on every element inside prose — catches Tailwind
+   utility classes that override the parent color.               */
+.prose p,
+.prose span,
+.prose li,
+.prose td,
+.prose dd,
+.prose dt,
+.prose label,
+.prose div:not([class*="highlight"]):not(pre):not(code) {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* ── Actual Claude response classes (no .prose used here) ───────
+   DOM dump confirmed: container = div.font-claude-response
+                       paragraphs = p.font-claude-response-body  */
+div.font-claude-response {
+  background: rgba(252, 243, 228, 0.84) !important;
+  backdrop-filter: blur(10px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(229, 180, 88, 0.20) !important;
+  padding: 12px 16px !important;
+  color: #000000 !important;
+}
+p.font-claude-response-body,
+p.font-claude-response-body * {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Inside the cream bubble, gold/yellow is unreadable — override
+   every element that normally gets #E5B458 or similar.          */
+div.font-claude-response a        { color: #863303 !important; }
+div.font-claude-response a:hover  { color: #D0271E !important; }
+/* Inline code only — dark-red on cream is readable.
+   Use :not(pre > code) so pre code gets its own lighter rule below. */
+div.font-claude-response code:not(pre code) {
+  color: #5A1800 !important;
+  background: rgba(134, 51, 3, 0.12) !important;
+  border-color: rgba(134, 51, 3, 0.20) !important;
+}
+/* Code blocks (pre > code) inside the cream bubble —
+   warm dark amber background + light cream text so it
+   still reads as a code block but fits the Himeko palette. */
+div.font-claude-response pre {
+  background: rgba(16, 5, 0, 0.90) !important;
+  border: 1px solid rgba(229, 180, 88, 0.18) !important;
+  border-top: 2px solid rgba(134, 51, 3, 0.80) !important;
+  border-radius: 6px !important;
+  box-shadow: inset 0 0 0 1px rgba(208, 39, 30, 0.08) !important;
+}
+div.font-claude-response pre code {
+  color: #F0E8D8 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+}
+div.font-claude-response .text-accent-000,
+div.font-claude-response .text-accent-100,
+div.font-claude-response .text-accent-200 { color: #5A1800 !important; }
+div.font-claude-response strong   { color: #1A0600 !important; }
+div.font-claude-response em       { color: #2A0E00 !important; }
+
+.prose h1, .prose h2, .prose h3,
+.prose h4, .prose h5, .prose h6 {
+  color: #0D0300 !important;
+  border-bottom: 1px solid rgba(134,51,3,0.25) !important;
+  padding-bottom: 0.16em !important;
+}
+.prose a         { color: #863303 !important; }
+.prose a:hover   { color: #D0271E !important; }
+.prose strong    { color: #0D0300 !important; font-weight: 600 !important; }
+.prose blockquote {
+  color: #3A1800 !important;
+  border-left-color: #863303 !important;
+  background: rgba(229,180,88,0.10) !important;
+}
+.prose hr { border-color: rgba(134,51,3,0.25) !important; }
+.prose thead th {
+  color: #F0E8D8 !important;                        /* stays light — dark bg */
+  background: rgba(12, 3, 0, 0.80) !important;
+  border-bottom: 2px solid rgba(229,180,88,0.32) !important;
+}
+.prose tbody tr:nth-child(even) { background: rgba(229,180,88,0.08) !important; }
+.prose td        { color: #1C0800 !important; }
+.prose ul > li::marker { color: #D0271E !important; }
+.prose ol > li::marker { color: #863303 !important; }
+
+
+/* ── 20. Dropdowns / Menus ──────────────────────────────────────*/
+[role="menu"],
+[role="listbox"],
+[data-radix-popper-content-wrapper] > * {
+  background: rgba(18, 4, 0, 0.97) !important;
+  border: 1px solid rgba(229,180,88,0.20) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.90) !important;
+}
+
+
+/* ── 21. Keyboard ───────────────────────────────────────────────*/
+kbd {
+  background:    rgba(134,51,3,0.50) !important;
+  border:        1px solid rgba(229,180,88,0.20) !important;
+  border-bottom: 2px solid #863303 !important;
+  border-radius: 3px !important;
+  color:         #F0CC78 !important;
+  padding: 0.1em 0.4em !important;
+  font-size: 0.8em !important;
+}
+
+
+/* ── 22. Dframe Main Content — THE grey culprit ─────────────────
+   main#dframe-main has rgb(31,31,30) solid from Cowork stylesheet.
+   This sits on top of everything and kills the background image.  */
+main#dframe-main,
+main.dframe-content,
+div.dframe-content-inner {
+  background-color: transparent !important;
+}
+
+/* Grid overlay div — absolute inset-0, covers entire viewport */
+div.pointer-events-none.absolute.inset-0 {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Selected nav item solid grey rgb(23,23,22) */
+div.group.relative.rounded-\[var\(--df-radius-pill\)\] {
+  background-color: transparent !important;
+}
+
+/* Tailwind /opacity modifier classes using old grey --bg-000 variable
+   (renders as rgba(44,44,42,x) instead of our dark-red)            */
+.bg-bg-000\/50 { background-color: rgba(2,  0, 0, 0.05) !important; }
+.bg-bg-000\/30 { background-color: rgba(2,  0, 0, 0.03) !important; }
+.bg-bg-000\/80 { background-color: rgba(2,  0, 0, 0.08) !important; }
+.bg-bg-100\/50 { background-color: rgba(8,  1, 0, 0.07) !important; }
+.bg-bg-100\/30 { background-color: rgba(8,  1, 0, 0.04) !important; }
+.bg-bg-200\/50 { background-color: rgba(14, 3, 0, 0.12) !important; }
+
+
+/* ── 23. Default Border Color Override ──────────────────────────
+   The Cowork dframe stylesheet sets rgb(226,225,218) as the default
+   border-color on html — it inherits to every element as grey.
+   Reset it here at the root so the cascade starts clean.        */
+html {
+  border-color: rgba(134, 51, 3, 0.15) !important;
+}
+
+
+/* ── 23. Cowork / Dframe Components ─────────────────────────────*/
+
+/* Active tab indicator pill — was rgb(61,61,61) dark grey */
+div.df-pill-indicator {
+  background-color: rgba(208, 39, 30, 0.55) !important;
+  box-shadow: rgba(208, 39, 30, 0.30) 0px 0px 0px 0.5px !important;
+}
+
+/* Left sidebar — mirrors the right panel treatment exactly,
+   just flipped: rounded right corners, glow on the right edge. */
+aside.dframe-sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 1, 0, 0.80)  0%,
+      rgba(6, 1, 0, 0.55) 20%,
+      rgba(0, 0, 0, 0.18) 42%,
+      rgba(0, 0, 0, 0.04) 58%,
+      rgba(0, 0, 0, 0.00) 78%,
+      rgba(0, 0, 0, 0.00) 100%
+    ),
+    url("/images/custom/Character_Himeko_Splash_Art.webp")
+    center 40% / cover no-repeat !important;
+  border-radius: 0 14px 14px 0 !important;
+  overflow: hidden !important;
+  /* right-side glow — mirrors the left-side glow on the right panel */
+  filter: drop-shadow(3px 0 18px rgba(208, 39, 30, 0.40)) !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  ) !important;
+}
+
+/* Inactive df-pill text — was rgb(151,149,140) grey */
+button.df-pill {
+  color: rgba(200, 168, 152, 0.65) !important;
+  border-color: transparent !important;
+}
+
+/* df-pills container */
+div.df-pills {
+  background-color: rgba(134, 51, 3, 0.10) !important;
+}
+
+/* Resize handle drag bar — was rgb(151,149,140) grey */
+div.absolute.rounded-full.transition-\[opacity\,background-color\] {
+  background-color: rgba(229, 180, 88, 0.50) !important;
+}
+
+/* Section label text in sidebar (was rgba(151,149,140,0.8)) */
+div.group\/labelrow {
+  color: rgba(200, 168, 152, 0.60) !important;
+}
+button.group\/label {
+  color: rgba(200, 168, 152, 0.60) !important;
+}
+
+/* Nav item text color (was rgb(144,112,96) — slightly off palette) */
+button.w-full.shrink-0.border-none.text-left {
+  color: rgb(144, 112, 96) !important;
+}
+
+/* Leading slot icons */
+span.df-leading-slot {
+  color: rgba(200, 168, 152, 0.70) !important;
+}
+
+
+/* ── 24. UI Polish — Text Readability & Palette Coherence ───────*/
+
+/* ─ Conversation / page title ───────────────────────────────────*/
+h1, h2 {
+  color: #FFFFFF !important;
+  text-shadow:
+    0 0 24px rgba(229, 180, 88, 0.25),
+    0 1px 8px rgba(0,   0,  0, 0.90) !important;
+}
+/* The conversation title in the header bar */
+[class*="conversation-title"],
+[class*="ConversationTitle"],
+[data-testid*="conversation-title"] {
+  color: #F0E8DC !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* ─ User message bubbles ────────────────────────────────────────*/
+[data-testid="user-message"],
+[class*="human-message"],
+[class*="HumanMessage"],
+[class*="user-message"] {
+  background: rgba(100, 30, 0, 0.42) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(229, 180, 88, 0.20) !important;
+  border-radius: 14px 14px 4px 14px !important;
+  color: #F5F0EC !important;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.80) !important;
+  padding: 12px 18px !important;
+}
+
+/* ─ Sidebar nav items ───────────────────────────────────────────*/
+/* Main items (New task, Projects, Scheduled…) */
+button.w-full.shrink-0.border-none.text-left {
+  color: rgba(220, 190, 165, 0.85) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.70) !important;
+}
+button.w-full.shrink-0.border-none.text-left:hover {
+  color: #E5B458 !important;
+  background: rgba(208, 39, 30, 0.10) !important;
+}
+
+/* Section headers — Pinned, Recents */
+div.group\/labelrow,
+button.group\/label {
+  color: rgba(229, 180, 88, 0.55) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-size: 0.72em !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.70) !important;
+}
+
+/* Conversation items in Recents list */
+[class*="conversation-item"],
+[class*="ConversationItem"],
+[data-testid*="conversation"] {
+  color: rgba(210, 185, 165, 0.80) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.60) !important;
+}
+[class*="conversation-item"]:hover,
+[class*="ConversationItem"]:hover {
+  color: #E5B458 !important;
+  background: rgba(208, 39, 30, 0.10) !important;
+}
+
+/* ─ Bottom model selector + disclaimer ─────────────────────────*/
+[class*="model-selector"],
+[class*="ModelSelector"],
+[data-testid*="model"] {
+  color: rgba(200, 168, 152, 0.75) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.70) !important;
+}
+[class*="model-selector"]:hover,
+[class*="ModelSelector"]:hover {
+  color: #E5B458 !important;
+}
+
+/* "Claude is AI and can make mistakes" footer */
+[class*="disclaimer"],
+[class*="Disclaimer"],
+[class*="claude-disclaimer"],
+footer p,
+[class*="footer-text"] {
+  color: rgba(160, 130, 110, 0.45) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.70) !important;
+}
+
+/* ─ Thinking / reasoning label ──────────────────────────────────*/
+[class*="thinking"],
+[class*="Thinking"],
+[data-testid*="thinking"] {
+  color: rgba(229, 180, 88, 0.70) !important;
+  text-shadow: 0 0 10px rgba(229, 180, 88, 0.20) !important;
+}
+
+/* ─ File / attachment chips ────────────────────────────────────*/
+[class*="attachment"],
+[class*="Attachment"],
+[class*="file-chip"],
+[class*="FileChip"] {
+  background: rgba(100, 30, 0, 0.55) !important;
+  border: 1px solid rgba(229, 180, 88, 0.22) !important;
+  color: #E5B458 !important;
+  border-radius: 8px !important;
+}
+
+/* ─ Placeholder text ────────────────────────────────────────────*/
+::placeholder {
+  color: rgba(180, 140, 110, 0.55) !important;
+}
+::-webkit-input-placeholder {
+  color: rgba(180, 140, 110, 0.55) !important;
+}
+
+/* ─ Icon glyphs in the top-bar (back, search, menu) ────────────*/
+[class*="icon-btn"],
+[class*="IconBtn"],
+button[class*="header"] svg,
+header button svg {
+  color: rgba(200, 168, 152, 0.75) !important;
+  fill:  rgba(200, 168, 152, 0.75) !important;
+}
+button[class*="header"]:hover svg,
+header button:hover svg {
+  color: #E5B458 !important;
+  fill:  #E5B458 !important;
+}
+
+/* ─ Badges / counts (notification dots) ────────────────────────*/
+[class*="badge"],
+[class*="Badge"],
+[class*="count-badge"] {
+  background: #D0271E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 6px rgba(208, 39, 30, 0.60) !important;
+}
+
+/* ─ Dividers inside the main chat area ─────────────────────────*/
+hr,
+[class*="divider"],
+[class*="Divider"] {
+  border-color: rgba(229, 180, 88, 0.12) !important;
+  background: linear-gradient(90deg, transparent, rgba(229,180,88,0.18), transparent) !important;
+  height: 1px !important;
+}
+
+/* ─ Tab/pill active state — extra glow ─────────────────────────*/
+button.df-pill[aria-selected="true"],
+button.df-pill[data-state="active"] {
+  color: #FFFFFF !important;
+  text-shadow: 0 0 12px rgba(229, 180, 88, 0.50) !important;
+}
+
+/* ─ Inline action buttons (copy, retry, thumbs…) ───────────────*/
+[class*="action-bar"] button,
+[class*="ActionBar"] button,
+[data-testid*="action"] button {
+  color: rgba(200, 168, 152, 0.60) !important;
+}
+[class*="action-bar"] button:hover,
+[class*="ActionBar"] button:hover {
+  color: #E5B458 !important;
+  background: rgba(229, 180, 88, 0.08) !important;
+}

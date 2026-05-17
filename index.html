@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Claude Theme Editor</title>
+    <link rel="stylesheet" href="renderer/style.css">
+  </head>
+  <body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Claude Theme Editor</h1>
+        </div>
+
+        <div class="section preset-section">
+        <div class="section-title">Themes</div>
+        <div class="preset-row">
+          <select id="presetSelect" class="preset-select">
+            <option value="">— select a theme —</option>
+          </select>
+          <button id="btnDeletePreset" class="preset-btn-icon" title="Delete selected theme">✕</button>
+        </div>
+        <div class="preset-row">
+          <input type="text" id="presetName" class="preset-input" placeholder="New theme name…">
+          <button id="btnSavePreset" class="preset-btn-save">Save</button>
+        </div>
+        </div>
+
+        <div class="section">
+        <div class="section-title">Palette</div>
+        <div class="control-row">
+            <label>Brand (crimson)</label>
+            <input type="color" id="themeCrimson" value="#D0271E">
+        </div>
+        <div class="control-row">
+            <label>Accent (gold)</label>
+            <input type="color" id="themeGold" value="#E5B458">
+        </div>
+        <div class="control-row">
+            <label>Mid-tone (ember)</label>
+            <input type="color" id="themeEmber" value="#863303">
+        </div>
+        </div>
+
+        <div class="section">
+        <div class="section-title">Bubbles & Composer</div>
+        <div class="control-row">
+            <label>User bubble</label>
+            <input type="color" id="userBubble" value="#641e00">
+        </div>
+        <div class="control-row">
+            <label>AI bubble</label>
+            <input type="color" id="aiBubble" value="#fcf3e4">
+        </div>
+        <div class="control-row">
+            <label>Composer bar</label>
+            <input type="color" id="composerBg" value="#040100">
+        </div>
+        </div>
+
+        <div class="section">
+        <div class="section-title">Text & Surfaces</div>
+        <div class="control-row">
+            <label>Base background</label>
+            <input type="color" id="bgBase" value="#000000">
+        </div>
+        <div class="control-row">
+            <label>User text</label>
+            <input type="color" id="userText" value="#F5F0EC">
+        </div>
+        <div class="control-row">
+            <label>AI text</label>
+            <input type="color" id="aiText" value="#000000">
+        </div>
+        <div class="control-row">
+            <label>Muted text</label>
+            <input type="color" id="textMuted" value="#C8A898">
+        </div>
+        </div>
+
+        <div class="section">
+        <div class="section-title">Images</div>
+
+        <div class="control-row">
+            <label>Right Panel Image</label>
+            <div class="image-slot" id="sidebarImageSlot">Pick</div>
+        </div>
+        <div class="control-row column">
+          <div class="row-top">
+            <label>Panel offset X</label>
+            <span id="sidebarPosXValue">60%</span>
+          </div>
+          <input type="range" id="sidebarPosX" min="0" max="100" value="60">
+        </div>
+        <div class="control-row column">
+          <div class="row-top">
+            <label>Panel offset Y</label>
+            <span id="sidebarPosYValue">30%</span>
+          </div>
+          <input type="range" id="sidebarPosY" min="0" max="100" value="30">
+        </div>
+
+        <div class="control-row">
+            <label>Left Sidebar Image</label>
+            <div class="image-slot" id="panelImageSlot">Pick</div>
+        </div>
+        <div class="control-row column">
+          <div class="row-top">
+            <label>Sidebar offset X</label>
+            <span id="panelPosXValue">50%</span>
+          </div>
+          <input type="range" id="panelPosX" min="0" max="100" value="50">
+        </div>
+        <div class="control-row column">
+          <div class="row-top">
+            <label>Sidebar offset Y</label>
+            <span id="panelPosYValue">67%</span>
+          </div>
+          <input type="range" id="panelPosY" min="0" max="100" value="67">
+        </div>
+
+        <div class="control-row">
+            <label>Body Wallpaper</label>
+            <div class="image-slot" id="bodyImageSlot">Pick</div>
+        </div>
+        </div>
+
+        <div class="section">
+        <div class="section-title">Opacities</div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>Sidebar</label>
+            <span id="sidebarOpacityValue">60%</span>
+        </div>
+        <input type="range" id="sidebarOpacity" min="0" max="100" value="60">
+        </div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>Panel</label>
+            <span id="panelOpacityValue">80%</span>
+        </div>
+        <input type="range" id="panelOpacity" min="0" max="100" value="80">
+        </div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>Code blocks</label>
+            <span id="codeOpacityValue">90%</span>
+        </div>
+        <input type="range" id="codeOpacity" min="0" max="100" value="90">
+        </div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>User bubble</label>
+            <span id="userBubbleOpacityValue">42%</span>
+        </div>
+        <input type="range" id="userBubbleOpacity" min="0" max="100" value="42">
+        </div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>AI bubble</label>
+            <span id="aiBubbleOpacityValue">82%</span>
+        </div>
+        <input type="range" id="aiBubbleOpacity" min="0" max="100" value="82">
+        </div>
+
+        <div class="control-row column">
+        <div class="row-top">
+            <label>Composer</label>
+            <span id="composerOpacityValue">88%</span>
+        </div>
+        <input type="range" id="composerOpacity" min="0" max="100" value="88">
+        </div>
+
+        <div class="actions">
+        <button id="btnExport">Export CSS</button>
+        <button id="btnApply" class="primary">Apply to Claude</button>
+        </div>
+
+    </div>
+    </div><!-- closes .sidebar -->
+
+    <div class="preview">
+      <div class="mock-claude">
+
+        <!-- Left sidebar -->
+        <div class="mock-sidebar">
+          <div class="mock-nav-label">Pinned</div>
+          <div class="mock-nav-item mock-nav-active">Current conversation</div>
+          <div class="mock-nav-item">Yesterday's chat</div>
+          <div class="mock-nav-label">Recent</div>
+          <div class="mock-nav-item">Last week</div>
+          <div class="mock-nav-item">My project</div>
+          <div class="mock-nav-badge">2</div>
+        </div>
+
+        <!-- Main chat -->
+        <div class="mock-chat">
+
+          <!-- Conversation title -->
+          <div class="mock-conv-title">How to fetch data in JS</div>
+
+          <!-- Thinking indicator -->
+          <div class="mock-thinking">⟳ Thinking…</div>
+
+          <!-- User message with file chip -->
+          <div class="mock-chip-row">
+            <div class="mock-chip">📎 data.json</div>
+          </div>
+          <div class="mock-user-bubble">How do I fetch data in JS?</div>
+
+          <!-- AI response -->
+          <div class="mock-ai-bubble">
+            <div class="mock-prose">
+              Use the <span class="mock-inline-code">fetch</span> API.
+              Check the <span class="mock-link">MDN docs</span> for details:
+            </div>
+            <div class="mock-code-block">
+              <div class="mock-code-header">javascript</div>
+              <div class="mock-code-body"><span class="mock-kw">const</span> res = <span class="mock-fn">fetch</span>(url)<br>&nbsp;&nbsp;.<span class="mock-fn">then</span>(r => r.<span class="mock-fn">json</span>())</div>
+            </div>
+          </div>
+
+          <!-- Action bar (copy / retry) -->
+          <div class="mock-action-bar">
+            <span class="mock-action-btn">⎘ Copy</span>
+            <span class="mock-action-btn">↺ Retry</span>
+          </div>
+
+          <!-- Divider -->
+          <div class="mock-divider"></div>
+
+          <!-- Tooltip example -->
+          <div class="mock-tooltip">Copied!</div>
+
+          <!-- Composer area -->
+          <div class="mock-composer-wrap">
+            <div class="mock-composer">
+              <span class="mock-placeholder">Message Claude…</span>
+              <span class="mock-send-btn">▶</span>
+            </div>
+            <div class="mock-model-selector">claude-sonnet ▾</div>
+            <div class="mock-disclaimer">Claude can make mistakes.</div>
+          </div>
+
+        </div>
+
+        <!-- Right panel -->
+        <div class="mock-panel">
+          <div class="mock-kbd-hint"><span class="mock-kbd">⌘K</span> search</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Disclaimer modal ── -->
+    <div id="disclaimerOverlay" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-disclaimer-banner">⚠ DISCLAIMER</div>
+
+        <div class="modal-body">
+          <p>This tool modifies Claude's internal application files (<code>app.asar</code>).</p>
+          <p>If something goes wrong you may:</p>
+          <ul>
+            <li>Break the Claude desktop app entirely</li>
+            <li>Lose access to your Cowork conversations</li>
+            <li>Need to reinstall Claude from scratch</li>
+          </ul>
+          <p>This is an <strong>unofficial</strong> modification. Anthropic does not support it and a Claude update will wipe your theme.</p>
+          <p>Always keep a backup of your original <code>app.asar</code> before applying.</p>
+        </div>
+
+        <label class="modal-check-row">
+          <input type="checkbox" id="disclaimerCheck">
+          <span>I understand I might brick my app and lose my Cowork conversations, and that's on me.</span>
+        </label>
+
+        <div class="modal-actions">
+          <button id="modalConfirm" class="primary" disabled>I understand, let me in</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Patch log panel ── -->
+    <div id="logPanel" class="log-panel hidden">
+      <div class="log-panel-header">
+        <span class="log-panel-title">Patch Log</span>
+        <button id="logClose" class="log-close-btn">✕</button>
+      </div>
+      <div id="logBody" class="log-body"></div>
+    </div>
+
+    <script src="renderer/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "claude-theme-editor",
+  "version": "1.0.0",
+  "description": "Visual theme editor for Claude (unofficial obv, but you know the drill)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "set CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder --win --x64"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@electron/asar": "^3.2.0",
+    "@electron/fuses": "^1.8.0"
+  },
+  "devDependencies": {
+    "electron": "^42.0.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.unofficial.claude-theme-editor",
+    "productName": "Claude Theme Editor",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer/**",
+      "src/**",
+      "theme-template.css",
+      "custom-base.css",
+      "node_modules/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "requireAdministrator"
+    }
+  }
+}
