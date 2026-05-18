@@ -1,5 +1,10 @@
 # Claude Theme Editor
 
+
+#IMPORTANT: MAY 18TH IS THE DAY THIS GOT 'NUKED'
+#WILL TRY TO FIX IT
+#YOU'VE BEEN WARNED
+
 An unofficial desktop tool for customizing the visual appearance of the Claude desktop app — colors, backgrounds, opacity, images, all with a live preview. Built by **Meritas**.
 
 > ⚠️ **This tool modifies Claude's internal application files. Read the disclaimer section before using it.**
